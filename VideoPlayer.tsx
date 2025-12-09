@@ -21,6 +21,8 @@ interface VideoPlayerProps {
   setBrushColor: (color: string) => void;
   setBrushSize: (size: number) => void;
   onReset: () => void;
+  seekTimestamp: number | null;
+  onSeekComplete: () => void;
 }
 
 export const VideoPlayer: React.FC<VideoPlayerProps> = ({
@@ -41,7 +43,9 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   onModeChange,
   setBrushColor,
   setBrushSize,
-  onReset
+  onReset,
+  seekTimestamp,
+  onSeekComplete
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -49,6 +53,15 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   
   const [isDrawing, setIsDrawing] = useState(false);
   const currentPath = useRef<Point[]>([]);
+
+  // Handle Seeking Request from Parent
+  useEffect(() => {
+    if (seekTimestamp !== null && videoRef.current) {
+        // Fast seek if supported, otherwise normal seek
+        videoRef.current.currentTime = seekTimestamp;
+        onSeekComplete();
+    }
+  }, [seekTimestamp, onSeekComplete]);
 
   // Sync Playback State
   useEffect(() => {
