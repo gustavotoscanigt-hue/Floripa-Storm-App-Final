@@ -158,54 +158,6 @@ function App() {
     setPlaybackRate(1.0);
   };
 
-  // --- Render ---
-
-  // Seek effect handler for VideoPlayer
-  const VideoWrapper = () => {
-    // We need to inject the logic to seek video when `seekTimestamp` changes
-    useEffect(() => {
-        if (seekTimestamp !== null) {
-            const videoEl = document.querySelector('video');
-            if (videoEl) {
-                videoEl.currentTime = seekTimestamp;
-                setSeekTimestamp(null); // Reset
-            }
-        }
-    }, [seekTimestamp]);
-
-    return (
-        <VideoPlayer
-            videoSrc={videoSrc}
-            drawings={drawings}
-            annotations={annotations}
-            activeClip={clips.find(c => c.id === activeClipId) || null}
-            toolMode={toolMode}
-            brushColor={brushColor}
-            brushSize={brushSize}
-            onAddAnnotation={handleAddAnnotation}
-            onAddDrawing={(d) => setDrawings(prev => [...prev, d])}
-            onClearAll={() => {
-                if (confirm("Clear all annotations?")) {
-                    setDrawings([]);
-                    setAnnotations([]);
-                    setClips([]);
-                }
-            }}
-            onVideoTimeUpdate={(curr, dur) => {
-                setCurrentTime(curr);
-                setDuration(dur);
-            }}
-            externalPlayState={isPlaying}
-            setExternalPlayState={setIsPlaying}
-            playbackRate={playbackRate}
-            onModeChange={setToolMode}
-            setBrushColor={setBrushColor}
-            setBrushSize={setBrushSize}
-            onReset={() => window.location.reload()}
-        />
-    );
-  };
-
   return (
     <div className="min-h-screen bg-gray-50 font-sans text-gray-800">
       <div className="container mx-auto p-4 md:p-8">
@@ -240,7 +192,37 @@ function App() {
         ) : (
             <div className="flex flex-col lg:flex-row gap-8">
                 <main className="lg:w-2/3">
-                    <VideoWrapper />
+                    <VideoPlayer
+                        videoSrc={videoSrc}
+                        drawings={drawings}
+                        annotations={annotations}
+                        activeClip={clips.find(c => c.id === activeClipId) || null}
+                        toolMode={toolMode}
+                        brushColor={brushColor}
+                        brushSize={brushSize}
+                        onAddAnnotation={handleAddAnnotation}
+                        onAddDrawing={(d) => setDrawings(prev => [...prev, d])}
+                        onClearAll={() => {
+                            if (confirm("Clear all annotations?")) {
+                                setDrawings([]);
+                                setAnnotations([]);
+                                setClips([]);
+                            }
+                        }}
+                        onVideoTimeUpdate={(curr, dur) => {
+                            setCurrentTime(curr);
+                            setDuration(dur);
+                        }}
+                        externalPlayState={isPlaying}
+                        setExternalPlayState={setIsPlaying}
+                        playbackRate={playbackRate}
+                        onModeChange={setToolMode}
+                        setBrushColor={setBrushColor}
+                        setBrushSize={setBrushSize}
+                        onReset={() => window.location.reload()}
+                        seekTimestamp={seekTimestamp}
+                        onSeekComplete={() => setSeekTimestamp(null)}
+                    />
                     
                     <div className="mt-6 bg-white p-4 rounded-lg shadow-sm flex items-center justify-between border">
                         <div className="flex items-center gap-4">
